@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Hybrid Edge-to-Cloud Visual Intelligence for Worker Operational Safety — Real-time IoT Dashboard">
+    <title>Hybrid Edge-Cloud Worker Safety Intelligence</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════
+     TOP NAVBAR
+     ═══════════════════════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+    <div class="nav-brand">
+        <div class="brand-icon">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+                <rect x="2" y="2" width="24" height="24" rx="6" stroke="url(#g1)" stroke-width="2.5"/>
+                <circle cx="10" cy="10" r="3" fill="#00e5ff"/>
+                <circle cx="18" cy="10" r="3" fill="#ff6b6b"/>
+                <circle cx="14" cy="18" r="3" fill="#69f0ae"/>
+                <line x1="10" y1="10" x2="18" y2="10" stroke="#ffffff40" stroke-width="1"/>
+                <line x1="10" y1="10" x2="14" y2="18" stroke="#ffffff40" stroke-width="1"/>
+                <line x1="18" y1="10" x2="14" y2="18" stroke="#ffffff40" stroke-width="1"/>
+                <defs><linearGradient id="g1" x1="0" y1="0" x2="28" y2="28"><stop stop-color="#00e5ff"/><stop offset="1" stop-color="#7c4dff"/></linearGradient></defs>
+            </svg>
+        </div>
+        <div class="brand-text">
+            <span class="brand-title">SafetyVision<sup>AI</sup></span>
+            <span class="brand-sub">Edge-to-Cloud Worker Intelligence</span>
+        </div>
+    </div>
+    <div class="nav-status">
+        <div class="status-chip online" id="conn-status">
+            <span class="status-dot"></span>
+            <span class="status-label">Live</span>
+        </div>
+        <div class="status-chip" id="uptime-chip">
+            <span class="status-label" id="uptime-display">00:00:00</span>
+        </div>
+        <div class="status-chip" id="tick-chip">
+            <span class="status-label">Tick: <span id="tick-count">0</span></span>
+        </div>
+    </div>
+    <div class="nav-actions">
+        <button class="btn-nav" id="btn-toggle-sidebar" title="Toggle Panels">☰</button>
+    </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     MAIN GRID LAYOUT
+     ═══════════════════════════════════════════════════════ -->
+<main class="dashboard" id="dashboard">
+
+    <!-- ──── LEFT COLUMN: Floor Map + Worker List ──── -->
+    <section class="panel panel-map" id="panel-map">
+        <div class="panel-header">
+            <h2>🏭 Factory Floor — Live Tracking</h2>
+            <div class="panel-actions">
+                <button class="btn-sm" id="btn-toggle-fov" title="Toggle Camera FOV">📡 FOV</button>
+                <button class="btn-sm" id="btn-toggle-zones" title="Toggle Zone Overlay">🗺️ Zones</button>
+            </div>
+        </div>
+        <div class="map-container">
+            <canvas id="floor-canvas" width="800" height="600"></canvas>
+            <div class="map-legend" id="map-legend">
+                <span class="legend-item"><span class="dot" style="background:#ff4444"></span>Danger</span>
+                <span class="legend-item"><span class="dot" style="background:#ff8800"></span>Restricted</span>
+                <span class="legend-item"><span class="dot" style="background:#ffcc00"></span>Caution</span>
+                <span class="legend-item"><span class="dot" style="background:#00cc66"></span>Safe</span>
+                <span class="legend-item"><span class="dot" style="background:#00e5ff"></span>Worker</span>
+                <span class="legend-item"><span class="dot" style="background:#7c4dff"></span>Camera</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ──── RIGHT COLUMN TOP: Worker Cards ──── -->
+    <section class="panel panel-workers" id="panel-workers">
+        <div class="panel-header">
+            <h2>👷 Workers — PPE & Vitals</h2>
+            <div class="worker-summary" id="worker-summary">
+                <span class="ws-badge ok" id="ws-compliant">0</span> Compliant
+                <span class="ws-badge warn" id="ws-violations">0</span> Violations
+            </div>
+        </div>
+        <div class="worker-grid" id="worker-grid">
+            <!-- Worker cards injected by JS -->
+        </div>
+    </section>
+
+    <!-- ──── ENVIRONMENT SENSORS ──── -->
+    <section class="panel panel-env" id="panel-env">
+        <div class="panel-header">
+            <h2>🌡️ Environmental IoT Sensors</h2>
+            <select id="env-zone-select" class="select-sm">
+                <!-- Populated by JS -->
+            </select>
+        </div>
+        <div class="sensor-grid" id="sensor-grid">
+            <!-- Sensor gauges injected by JS -->
+        </div>
+    </section>
+
+    <!-- ──── EDGE COMPUTE NODES ──── -->
+    <section class="panel panel-edge" id="panel-edge">
+        <div class="panel-header">
+            <h2>🖥️ Edge Compute Nodes</h2>
+            <span class="panel-badge" id="edge-model-badge">YOLOv8-nano</span>
+        </div>
+        <div class="edge-grid" id="edge-grid">
+            <!-- Edge camera cards injected by JS -->
+        </div>
+    </section>
+
+    <!-- ──── CLOUD PIPELINE ──── -->
+    <section class="panel panel-cloud" id="panel-cloud">
+        <div class="panel-header">
+            <h2>☁️ Cloud Pipeline Metrics</h2>
+            <span class="panel-badge" id="cloud-provider-badge">AWS IoT Core</span>
+        </div>
+        <div class="cloud-metrics" id="cloud-metrics">
+            <!-- Cloud stats injected by JS -->
+        </div>
+        <div class="cloud-chart-container">
+            <canvas id="latency-chart" height="120"></canvas>
+        </div>
+    </section>
+
+    <!-- ──── ALERT FEED ──── -->
+    <section class="panel panel-alerts" id="panel-alerts">
+        <div class="panel-header">
+            <h2>🚨 Safety Alert Feed</h2>
+            <div class="panel-actions">
+                <div class="alert-counters" id="alert-counters">
+                    <span class="ac critical" id="ac-critical">0</span>
+                    <span class="ac high" id="ac-high">0</span>
+                    <span class="ac medium" id="ac-medium">0</span>
+                </div>
+                <button class="btn-sm btn-danger" id="btn-clear-alerts">Clear All</button>
+            </div>
+        </div>
+        <div class="alert-list" id="alert-list">
+            <!-- Alert items injected by JS -->
+        </div>
+    </section>
+
+    <!-- ──── INCIDENT SIMULATOR ──── -->
+    <section class="panel panel-incident" id="panel-incident">
+        <div class="panel-header">
+            <h2>⚡ Incident Simulator (Demo)</h2>
+        </div>
+        <div class="incident-grid">
+            <button class="btn-incident" data-type="gas_leak">
+                <span class="inc-icon">☠️</span>
+                <span class="inc-label">Gas Leak</span>
+            </button>
+            <button class="btn-incident" data-type="fire">
+                <span class="inc-icon">🔥</span>
+                <span class="inc-label">Fire</span>
+            </button>
+            <button class="btn-incident" data-type="worker_fall">
+                <span class="inc-icon">🤕</span>
+                <span class="inc-label">Worker Fall</span>
+            </button>
+            <button class="btn-incident" data-type="intrusion">
+                <span class="inc-icon">🚫</span>
+                <span class="inc-label">Zone Intrusion</span>
+            </button>
+            <button class="btn-incident" data-type="ppe_mass">
+                <span class="inc-icon">🦺</span>
+                <span class="inc-label">Mass PPE Fail</span>
+            </button>
+        </div>
+        <div class="incident-info">
+            <p>Click any button above to inject a simulated safety incident into the live data stream. 
+            Observe how edge nodes detect it, alerts propagate, and the cloud pipeline responds.</p>
+        </div>
+    </section>
+
+    <!-- ──── ANALYTICS OVERVIEW ──── -->
+    <section class="panel panel-analytics" id="panel-analytics">
+        <div class="panel-header">
+            <h2>📊 Analytics Overview</h2>
+        </div>
+        <div class="analytics-cards">
+            <div class="acard">
+                <div class="acard-value" id="analytics-total-workers">0</div>
+                <div class="acard-label">Active Workers</div>
+            </div>
+            <div class="acard">
+                <div class="acard-value" id="analytics-ppe-rate">0%</div>
+                <div class="acard-label">PPE Compliance</div>
+            </div>
+            <div class="acard">
+                <div class="acard-value" id="analytics-avg-fatigue">0</div>
+                <div class="acard-label">Avg. Fatigue</div>
+            </div>
+            <div class="acard">
+                <div class="acard-value" id="analytics-edge-fps">0</div>
+                <div class="acard-label">Avg. Edge FPS</div>
+            </div>
+            <div class="acard">
+                <div class="acard-value" id="analytics-cloud-latency">0ms</div>
+                <div class="acard-label">Cloud Latency</div>
+            </div>
+            <div class="acard">
+                <div class="acard-value" id="analytics-detections">0</div>
+                <div class="acard-label">Total Detections</div>
+            </div>
+            <div class="acard">
+                <div class="acard-value" id="analytics-data-points">0</div>
+                <div class="acard-label">Data Points</div>
+            </div>
+            <div class="acard">
+                <div class="acard-value" id="analytics-model-acc">0%</div>
+                <div class="acard-label">Model Accuracy</div>
+            </div>
+        </div>
+        <div class="analytics-chart-container">
+            <canvas id="ppe-chart" height="160"></canvas>
+        </div>
+    </section>
+
+    <!-- ──── ARCHITECTURE DIAGRAM ──── -->
+    <section class="panel panel-arch" id="panel-arch">
+        <div class="panel-header">
+            <h2>🏗️ System Architecture</h2>
+        </div>
+        <div class="arch-diagram" id="arch-diagram">
+            <div class="arch-layer arch-edge">
+                <h3>Edge Layer</h3>
+                <div class="arch-nodes">
+                    <div class="arch-node"><span>📷</span>Camera 1<br><small>Jetson Nano</small></div>
+                    <div class="arch-node"><span>📷</span>Camera 2<br><small>Jetson Nano</small></div>
+                    <div class="arch-node"><span>📷</span>Camera 3<br><small>Jetson Nano</small></div>
+                    <div class="arch-node"><span>📷</span>Camera 4<br><small>Jetson Nano</small></div>
+                </div>
+                <div class="arch-label">YOLOv8-nano • PPE/Posture Detection • Local Inference</div>
+            </div>
+            <div class="arch-arrow">▼ MQTT / WebSocket ▼</div>
+            <div class="arch-layer arch-gateway">
+                <h3>IoT Gateway</h3>
+                <div class="arch-nodes">
+                    <div class="arch-node"><span>🌐</span>Gateway<br><small>Protocol Translation</small></div>
+                    <div class="arch-node"><span>📡</span>Sensors<br><small>Env Monitoring</small></div>
+                    <div class="arch-node"><span>⚡</span>Edge Agg.<br><small>Pre-processing</small></div>
+                </div>
+                <div class="arch-label">Data Aggregation • Filtering • Edge Analytics</div>
+            </div>
+            <div class="arch-arrow">▼ TLS / HTTPS ▼</div>
+            <div class="arch-layer arch-cloud">
+                <h3>Cloud Layer</h3>
+                <div class="arch-nodes">
+                    <div class="arch-node"><span>☁️</span>AWS IoT<br><small>Core</small></div>
+                    <div class="arch-node"><span>🧠</span>AI Engine<br><small>Deep Analytics</small></div>
+                    <div class="arch-node"><span>📊</span>Dashboard<br><small>Visualization</small></div>
+                    <div class="arch-node"><span>🔔</span>Alerts<br><small>Notification</small></div>
+                </div>
+                <div class="arch-label">Cloud Inference • Historical Analysis • Alert Dispatch</div>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<!-- ═══════════════════════════════════════════════════════
+     SCRIPTS
+     ═══════════════════════════════════════════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.4/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="/static/js/app.js"></script>
+</body>
+</html>
